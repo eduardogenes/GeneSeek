@@ -18,10 +18,10 @@ export default function Home() {
     const file = files[0];
     setIsLoading(true); // Informa à UI que o carregamento começou
 
-    parseCsv(file, (results) => {
+    parseCsv(file, (imoveis) => {
       // Aqui você pode adicionar uma etapa de transformação/limpeza dos dados se necessário
       // Ex: Converter strings de preço para números, normalizar nomes de colunas, etc.
-      setImoveis(results.data); // Salva os dados no contexto
+      setImoveis(imoveis); // Salva os dados no contexto
       setIsLoading(false); // Carregamento concluído
       router.push('/imoveis'); // Navega para a página de visualização
     });
@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">GeneSeek</h1>
+        <h1 className="text-4xl font-bold mb-4">Geneseek</h1>
         <p className="text-lg text-muted-foreground mb-8">
           Análise automatizada de imóveis da Caixa Econômica Federal.
         </p>
