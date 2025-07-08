@@ -7,8 +7,8 @@ import { ImoveisProvider } from "@/context/imoveis-context"; // Importe o Provid
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Geneseek",
-  description: "Análise de imóveis da Caixa",
+  title: "Garimpeiro Genes",
+  description: "Encontre as melhores oportunidades em imóveis da Caixa",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
-        <ImoveisProvider>{children}</ImoveisProvider> {/* Envolva o children */}
+        <ImoveisProvider>{children}</ImoveisProvider> { /* Envolva o children */ }
       </body>
     </html>
   );
