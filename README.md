@@ -12,7 +12,7 @@ O Geneseek transforma a complexa e extensa planilha de imóveis da Caixa em uma 
 
 ### ✨ Demonstração
 
-![Demo do Geneseek](https://via.placeholder.com/800x450.png?text=Grave+um+GIF+da+sua+aplicação+aqui!)
+![Demo do Geneseek](https://geneseek.vercel.app/)
 
 ---
 
