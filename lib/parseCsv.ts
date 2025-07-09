@@ -11,11 +11,11 @@ function handleParseComplete(results: ParseResult<string[]>, callback: (imoveis:
   const dataRows = results.data.slice(2);
 
   const imoveis: Imovel[] = dataRows.map(row => {
-    const imovel: any = {};
+    const imovel: Partial<Imovel> = {};
     header.forEach((key, index) => {
       // Remove espaços extras das chaves para segurança
       const trimmedKey = key.trim();
-      imovel[trimmedKey] = row[index];
+      imovel[trimmedKey as keyof Imovel] = row[index];
     });
     return imovel as Imovel;
   }).filter(imovel => imovel['N° do imóvel']); // Filtra linhas vazias no final

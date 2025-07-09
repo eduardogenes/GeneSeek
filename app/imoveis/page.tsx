@@ -2,7 +2,6 @@
 'use client';
 import { useImoveis } from "@/context/imoveis-context";
 import CardImovel from "@/components/ui/CardImovel";
-import { Imovel } from "@/lib/types";
 
 export default function ImoveisPage() {
   const { imoveis, isLoading } = useImoveis(); // Consumindo os dados do contexto
