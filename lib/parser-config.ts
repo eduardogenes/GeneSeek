@@ -1,18 +1,26 @@
 // lib/parser-config.ts
 
-export type ImovelKey = 'id' | 'uf' | 'cidade' | 'bairro' | 'endereco' | 'preco' | 'valorAvaliacao' | 'desconto' | 'descricao' | 'modalidade' | 'link';
+/**
+ * Define as chaves padronizadas para o objeto Imovel.
+ * Garante consistência em toda a aplicação.
+ */
+export type ImovelKey = 'numeroImovel' | 'uf' | 'cidade' | 'bairro' | 'endereco' | 'preco' | 'valorAvaliacao' | 'desconto' | 'descricao' | 'modalidadeVenda' | 'link' | 'id';
 
-export const HEADER_MAP: Record<ImovelKey, string[]> = {
-  // Adicionamos as versões com erro de codificação encontradas no log
-  id: ['n° do imóvel', 'n do imovel', 'numero do imovel', 'nÂ° do imÃ³vel'],
-  uf: ['uf', 'estado'],
-  cidade: ['cidade', 'município', 'municipio'],
-  bairro: ['bairro'],
-  endereco: ['endereço', 'endereco', 'endereÃ§o'],
-  preco: ['preço', 'preco', 'valor de venda', 'preÃ§o'],
-  valorAvaliacao: ['valor de avaliação', 'valor de avaliacao', 'avaliação', 'valor de avaliaÃ§Ã£o'],
-  desconto: ['desconto', '% desconto'],
-  descricao: ['descrição', 'descricao', 'descriÃ§Ã£o'],
-  modalidade: ['modalidade de venda', 'modalidade'],
-  link: ['link de acesso', 'link', 'url'],
-};
+/**
+ * Mapeamento de padrões de cabeçalho para as chaves padronizadas de Imovel.
+ * Usa RegExp para lidar com variações comuns nos nomes das colunas dos arquivos CSV da Caixa,
+ * como acentuação, maiúsculas/minúsculas e palavras alternativas.
+ */
+export const HEADER_PATTERNS: { pattern: RegExp; name: ImovelKey }[] = [
+  { pattern: /n[º°]\s*do\s*im[oó]vel/i, name: 'numeroImovel' },
+  { pattern: /uf|estado/i, name: 'uf' },
+  { pattern: /cidade|munic[ií]pio/i, name: 'cidade' },
+  { pattern: /bairro/i, name: 'bairro' },
+  { pattern: /endere[çc]o/i, name: 'endereco' },
+  { pattern: /pre[çc]o/i, name: 'preco' },
+  { pattern: /valor\s*de\s*avalia[çc][aã]o|avalia[çc][aã]o/i, name: 'valorAvaliacao' },
+  { pattern: /desconto|%\s*de\s*desconto/i, name: 'desconto' },
+  { pattern: /descri[çc][aã]o|caracter[ií]sticas/i, name: 'descricao' },
+  { pattern: /modalidade|tipo\s*de\s*venda/i, name: 'modalidadeVenda' },
+  { pattern: /link|acesso|url/i, name: 'link' }
+];
