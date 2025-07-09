@@ -1,14 +1,17 @@
 // lib/types.ts
 export interface Imovel {
-    'N° do imóvel': string;
-    'UF': string;
-    'Cidade': string;
-    'Bairro': string;
-    'Endereço': string;
-    'Preço': string;
-    'Valor de avaliação': string;
-    'Desconto': string;
-    'Descrição': string;
-    'Modalidade de venda': string;
-    'Link de acesso': string;
-  }
+  id: string;
+  uf: string;
+  cidade: string;
+  bairro: string;
+  endereco: string;
+  preco: string;
+  valorAvaliacao: string;
+  desconto: string;
+  descricao: string;
+  modalidade: string;
+  link: string;
+  areaPrivativa?: string;
+  // Permite que outras propriedades existam sem quebrar o tipo
+  [key: string]: any;
+}

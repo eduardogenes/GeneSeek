@@ -7,20 +7,21 @@ interface CardImovelProps {
 }
 
 export default function CardImovel({ imovel }: CardImovelProps) {
-  // Acessando as propriedades com notação de colchetes para segurança
-  const preco = imovel['Preço'] || 'N/A';
-  const desconto = imovel['Desconto'] || '0';
-  const endereco = imovel['Endereço'] || 'Endereço não informado';
-  const link = imovel['Link de acesso'];
+  // Acessando as propriedades do imóvel
+  const preco = imovel.preco || 'N/A';
+  const desconto = imovel.desconto || '0';
+  const endereco = imovel.endereco || 'Endereço não informado';
+  const link = imovel.link;
+  
 
   return (
     <div className="border p-4 rounded-lg shadow-md bg-card text-card-foreground flex flex-col justify-between">
       <div>
-        <h3 className="font-bold text-lg">{imovel.Cidade} - {imovel.Bairro}</h3>
+        <h3 className="font-bold text-lg">{imovel.cidade} - {imovel.bairro}</h3>
         <p className="text-sm text-muted-foreground truncate" title={endereco}>{endereco}</p>
         <div className="mt-4 text-sm">
           <p><span className="font-semibold">Preço de Venda:</span> R$ {preco}</p>
-          <p><span className="font-semibold">Valor de Avaliação:</span> R$ {imovel['Valor de avaliação']}</p>
+          <p><span className="font-semibold">Valor de Avaliação:</span> R$ {imovel.valorAvaliacao}</p>
           <p className="text-green-600 dark:text-green-400"><span className="font-semibold">Desconto:</span> {parseFloat(desconto).toFixed(2)}%</p>
         </div>
       </div>
