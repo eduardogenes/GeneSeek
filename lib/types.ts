@@ -24,7 +24,7 @@ export interface Imovel {
   
   /**
    * Assinatura de índice para permitir propriedades não mapeadas.
-   * Torna o tipo flexível a colunas extras no CSV que não são utilizadas.
+   * Usa `unknown` em vez de `any` para maior segurança de tipos.
    */
-  [key: string]: any;
+  [key: string]: string | number | boolean | null | undefined;
 }
