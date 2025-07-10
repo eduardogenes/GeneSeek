@@ -1,5 +1,6 @@
+// app/page.tsx
 'use client'
-import React from 'react'
+import React, { useState } from 'react' // Importe o useState
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { parseCsv } from '@/lib/parseCsv'
@@ -8,26 +9,32 @@ import { useImoveis } from '@/context/imoveis-context'
 export default function Home() {
   const router = useRouter()
   const { setImoveis, setIsLoading } = useImoveis()
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-    setIsLoading(true)
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+  
+    const file = files[0];
+    setIsLoading(true);
+    setErrorMessage(''); // Limpa erros anteriores ao iniciar um novo upload
 
     parseCsv(file, (imoveis) => {
-      // aqui você pode incluir limpeza/transformações se quiser
-      setImoveis(imoveis)
-      setIsLoading(false)
-      router.push('/imoveis')
-    })
-  }
+      setImoveis(imoveis);
+      setIsLoading(false);
+      
+      if (imoveis.length > 0) {
+        router.push('/imoveis');
+      } else {
+        // Define uma mensagem de erro se o parse falhar
+        setErrorMessage("Não foi possível processar o arquivo. Verifique o formato e tente novamente.");
+      }
+    });
+  };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-16 bg-[#fdfcfa]">
+    <main className="min-h-screen flex items-center justify-center px-6 py-16 bg-secondary">
       <div className="max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* Imagem */}
         <Image
           src="/images/garimpeiro-home.png"
           alt="Garimpeiro Genes"
@@ -36,15 +43,11 @@ export default function Home() {
           className="w-full max-w-md mx-auto"
           priority
         />
-
-        {/* Conteúdo */}
         <div className="text-center md:text-left">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Garimpeiro Genes</h1>
           <p className="text-lg text-gray-600 mb-8">
             Encontre as melhores oportunidades em imóveis da Caixa Econômica Federal.
           </p>
-
-          {/* Botão estilizado */}
           <div>
             <label
               htmlFor="csv-upload"
@@ -60,6 +63,10 @@ export default function Home() {
               className="hidden"
             />
           </div>
+          {/* Exibe a mensagem de erro, se houver */}
+          {errorMessage && (
+            <p className="mt-4 text-sm text-red-600 font-semibold">{errorMessage}</p>
+          )}
         </div>
       </div>
     </main>
