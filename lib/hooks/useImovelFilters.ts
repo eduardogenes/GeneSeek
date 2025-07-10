@@ -32,7 +32,7 @@ export function useImovelFilters(imoveis: Imovel[]) {
   const imoveisProcessados = useMemo(() => {
     if (!imoveis) return [];
 
-    let resultados = imoveis.filter(imovel => {
+    const resultados = imoveis.filter(imovel => {
       if (cidadesFiltro.length > 0 && !cidadesFiltro.includes(imovel.cidade)) return false;
       if (modalidadesFiltro.length > 0 && !modalidadesFiltro.includes(imovel.modalidadeVenda)) return false;
       if (bairroFiltro && !imovel.bairro.toLowerCase().includes(bairroFiltro.toLowerCase())) return false;
