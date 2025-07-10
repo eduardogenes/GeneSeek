@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 export default function ImoveisPage() {
   const { imoveis, isLoading } = useImoveis();
-  const { imoveisFiltrados, opcoes, filtros, handlers, limparFiltros } = useImovelFilters(imoveis);
+  const { imoveisProcessados, opcoes, filtros, handlers, limparFiltros } = useImovelFilters(imoveis);
 
   if (isLoading) {
     return (
@@ -39,13 +39,11 @@ export default function ImoveisPage() {
           <Image
             src="/images/garimpeiro-home.png"
             alt="Mascote Garimpeiro Genes"
-            // AQUI: Imagem aumentada para 60px
             width={60}
             height={60}
             className="rounded-full"
           />
-          {/* AQUI: Texto do título diminuído para 2xl */}
-          <h1 className="text-2x1 font-bold">Imóveis Encontrados ({imoveisFiltrados.length})</h1>
+          <h1 className="text-2xl font-bold">Imóveis Encontrados ({imoveisProcessados.length})</h1>
         </div>
         <Link href="/" className="text-sm font-medium text-primary hover:underline whitespace-nowrap">
           Carregar outra planilha
@@ -59,9 +57,9 @@ export default function ImoveisPage() {
         onClear={limparFiltros}
       />
       
-      {imoveisFiltrados.length > 0 ? (
+      {imoveisProcessados.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {imoveisFiltrados.map((imovel) => (
+          {imoveisProcessados.map((imovel) => (
             <CardImovel key={imovel.id} imovel={imovel} />
           ))}
         </div>
