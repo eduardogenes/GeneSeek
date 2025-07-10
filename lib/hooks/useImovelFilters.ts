@@ -1,103 +1,96 @@
 // lib/hooks/useImovelFilters.ts
 'use client';
 
-import { useState, useMemo, useCallback } from 'react'; // Adicione useCallback
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Imovel } from '@/lib/types';
 
-/**
- * Hook personalizado para gerir toda a lógica de estado e filtragem da lista de imóveis.
- */
 export function useImovelFilters(imoveis: Imovel[]) {
-  // --- ESTADOS DOS FILTROS ---
   const [cidadesFiltro, setCidadesFiltro] = useState<string[]>([]);
+  const [modalidadesFiltro, setModalidadesFiltro] = useState<string[]>([]);
+  const [termoBairro, setTermoBairro] = useState('');
   const [bairroFiltro, setBairroFiltro] = useState('');
   const [precoMaxFiltro, setPrecoMaxFiltro] = useState('');
   const [descontoMinFiltro, setDescontoMinFiltro] = useState('');
-  const [modalidadesFiltro, setModalidadesFiltro] = useState<string[]>([]);
+  const [ordenacao, setOrdenacao] = useState('maior-desconto');
 
-  // --- OPÇÕES DINÂMICAS PARA OS DROPDOWNS ---
+  useEffect(() => {
+    const timer = setTimeout(() => setBairroFiltro(termoBairro), 500);
+    return () => clearTimeout(timer);
+  }, [termoBairro]);
+
   const { cidadesUnicas, modalidadesUnicas } = useMemo(() => {
     if (!imoveis) return { cidadesUnicas: [], modalidadesUnicas: [] };
-
     const cidades = new Set(imoveis.map(imovel => imovel.cidade).filter(Boolean));
     const modalidades = new Set(imoveis.map(imovel => imovel.modalidadeVenda).filter(Boolean));
-
     return {
       cidadesUnicas: Array.from(cidades).sort(),
       modalidadesUnicas: Array.from(modalidades).sort(),
     };
   }, [imoveis]);
 
-  // --- LÓGICA DE FILTRAGEM ---
-  const imoveisFiltrados = useMemo(() => {
+  // Renomeado para imoveisProcessados para clareza
+  const imoveisProcessados = useMemo(() => {
     if (!imoveis) return [];
 
-    return imoveis.filter(imovel => {
+    let resultados = imoveis.filter(imovel => {
       if (cidadesFiltro.length > 0 && !cidadesFiltro.includes(imovel.cidade)) return false;
-      
       if (modalidadesFiltro.length > 0 && !modalidadesFiltro.includes(imovel.modalidadeVenda)) return false;
-
       if (bairroFiltro && !imovel.bairro.toLowerCase().includes(bairroFiltro.toLowerCase())) return false;
       if (precoMaxFiltro && parseFloat(imovel.preco) > parseFloat(precoMaxFiltro)) return false;
       if (descontoMinFiltro && parseFloat(imovel.desconto) < parseFloat(descontoMinFiltro)) return false;
-      
       return true;
     });
-  }, [imoveis, cidadesFiltro, bairroFiltro, precoMaxFiltro, descontoMinFiltro, modalidadesFiltro]);
 
-  // --- FUNÇÕES DE CONTROLO ---
+    const resultadosOrdenados = [...resultados];
+    if (ordenacao === 'maior-desconto') {
+      resultadosOrdenados.sort((a, b) => parseFloat(b.desconto) - parseFloat(a.desconto));
+    } else if (ordenacao === 'menor-preco') {
+      resultadosOrdenados.sort((a, b) => parseFloat(a.preco) - parseFloat(b.preco));
+    } else if (ordenacao === 'maior-preco') {
+      resultadosOrdenados.sort((a, b) => parseFloat(b.preco) - parseFloat(a.preco));
+    }
 
-  //uma otimização que impede que a função seja recriada a cada renderização.
+    return resultadosOrdenados;
+  }, [imoveis, cidadesFiltro, modalidadesFiltro, bairroFiltro, precoMaxFiltro, descontoMinFiltro, ordenacao]);
+
   const handleCidadeToggle = useCallback((cidade: string) => {
-    setCidadesFiltro(prev => 
-      prev.includes(cidade)
-        ? prev.filter(c => c !== cidade)
-        : [...prev, cidade]
-    );
+    setCidadesFiltro(prev => prev.includes(cidade) ? prev.filter(c => c !== cidade) : [...prev, cidade]);
   }, []);
-
-  // Função para alternar uma modalidade no filtro
+  
   const handleModalidadeToggle = useCallback((modalidade: string) => {
-    setModalidadesFiltro(prev => 
-      prev.includes(modalidade)
-        ? prev.filter(m => m !== modalidade)
-        : [...prev, modalidade]
-    );
+    setModalidadesFiltro(prev => prev.includes(modalidade) ? prev.filter(m => m !== modalidade) : [...prev, modalidade]);
   }, []);
 
   const limparFiltros = () => {
     setCidadesFiltro([]);
-    setBairroFiltro('');
+    setModalidadesFiltro([]);
+    setTermoBairro('');
     setPrecoMaxFiltro('');
     setDescontoMinFiltro('');
-    setModalidadesFiltro([]);
+    setOrdenacao('maior-desconto');
   };
 
-  // --- VALORES E HANDLERS PARA O COMPONENTE ---
-  const opcoes = useMemo(() => ({
-    cidades: cidadesUnicas,
-    modalidades: modalidadesUnicas,
-  }), [cidadesUnicas, modalidadesUnicas]);
-
-  const filtros = useMemo(() => ({
-    cidades: cidadesFiltro,
-    bairro: bairroFiltro,
-    precoMax: precoMaxFiltro,
-    descontoMin: descontoMinFiltro,
-    modalidades: modalidadesFiltro,
-  }), [cidadesFiltro, bairroFiltro, precoMaxFiltro, descontoMinFiltro, modalidadesFiltro]);
-
-  // --- RETORNO DO HOOK ---
   return {
-    imoveisFiltrados,
-    opcoes,
-    filtros,
+    imoveisProcessados, // CORREÇÃO: Devolvendo a variável com o nome correto.
+    opcoes: {
+      cidades: cidadesUnicas,
+      modalidades: modalidadesUnicas,
+    },
+    filtros: {
+      cidades: cidadesFiltro,
+      modalidades: modalidadesFiltro,
+      bairro: termoBairro,
+      precoMax: precoMaxFiltro,
+      descontoMin: descontoMinFiltro,
+      ordenacao: ordenacao,
+    },
     handlers: {
       handleCidadeToggle,
       handleModalidadeToggle,
-      setBairro: setBairroFiltro,
+      setBairro: setTermoBairro,
       setPrecoMax: setPrecoMaxFiltro,
       setDescontoMin: setDescontoMinFiltro,
+      setOrdenacao: setOrdenacao,
     },
     limparFiltros,
   };

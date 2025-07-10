@@ -6,8 +6,8 @@ import { InputFilter } from "./filters/InputFilter";
 
 interface ImovelFiltersProps {
   opcoes: {
-      cidades: string[];
-      modalidades: string[];
+    cidades: string[];
+    modalidades: string[];
   };
   filtros: {
     cidades: string[];
@@ -15,6 +15,7 @@ interface ImovelFiltersProps {
     bairro: string;
     precoMax: string;
     descontoMin: string;
+    ordenacao: string;
   };
   handlers: {
     handleCidadeToggle: (cidade: string) => void;
@@ -22,6 +23,7 @@ interface ImovelFiltersProps {
     setBairro: (value: string) => void;
     setPrecoMax: (value: string) => void;
     setDescontoMin: (value: string) => void;
+    setOrdenacao: (value: string) => void;
   };
   onClear: () => void;
 }
@@ -30,16 +32,26 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
   return (
     <div className="p-4 border rounded-lg bg-card mb-6 shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Filtros</h2>
-        <button
-            onClick={onClear}
-            className="text-sm font-semibold text-primary hover:underline"
-          >
-            Limpar Filtros
+        <h2 className="text-xl font-semibold">Filtros e Ordenação</h2>
+        <button onClick={onClear} className="text-sm font-semibold text-primary hover:underline">
+          Limpar Tudo
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div>
+          <label htmlFor="ordenacao" className="block text-sm font-medium text-muted-foreground mb-1">Ordenar por</label>
+          <select
+            id="ordenacao"
+            value={filtros.ordenacao}
+            onChange={(e) => handlers.setOrdenacao(e.target.value)}
+            className="w-full h-10 px-3 bg-background border rounded-md text-sm"
+          >
+            <option value="maior-desconto">Maior Desconto</option>
+            <option value="menor-preco">Menor Preço</option>
+            <option value="maior-preco">Maior Preço</option>
+          </select>
+        </div>
         
         <MultiSelectFilter
           label="Cidades"
@@ -48,7 +60,6 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
           selectedValues={filtros.cidades}
           onToggle={handlers.handleCidadeToggle}
         />
-
         <MultiSelectFilter
           label="Modalidades"
           placeholder="Selecione as modalidades"
@@ -56,14 +67,12 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
           selectedValues={filtros.modalidades}
           onToggle={handlers.handleModalidadeToggle}
         />
-
         <InputFilter
           label="Bairro"
           placeholder="Nome do bairro"
           value={filtros.bairro}
           onChange={handlers.setBairro}
         />
-
         <InputFilter
           label="Preço Máximo"
           placeholder="Ex: 300000"
@@ -71,7 +80,6 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
           value={filtros.precoMax}
           onChange={handlers.setPrecoMax}
         />
-
         <InputFilter
           label="Desconto Mínimo (%)"
           placeholder="Ex: 40"
@@ -79,7 +87,6 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
           value={filtros.descontoMin}
           onChange={handlers.setDescontoMin}
         />
-
       </div>
     </div>
   );
