@@ -6,6 +6,7 @@ import CardImovel from "@/components/features/CardImovel";
 import { ImovelFilters } from "@/components/features/ImovelFilters";
 import { useImovelFilters } from "@/lib/hooks/useImovelFilters";
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ImoveisPage() {
   const { imoveis, isLoading } = useImoveis();
@@ -32,13 +33,23 @@ export default function ImoveisPage() {
   }
 
   return (
-    // Alterado: Adicionado um container para limitar a largura e centralizar
     <main className="container mx-auto p-4 md:p-8">
-      <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">Imóveis Encontrados ({imoveisFiltrados.length})</h1>
-          <Link href="/" className="text-sm font-medium text-primary hover:underline">
-            Carregar outra planilha
-          </Link>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-4">
+          <Image
+            src="/images/garimpeiro-home.png"
+            alt="Mascote Garimpeiro Genes"
+            // AQUI: Imagem aumentada para 60px
+            width={60}
+            height={60}
+            className="rounded-full"
+          />
+          {/* AQUI: Texto do título diminuído para 2xl */}
+          <h1 className="text-2x1 font-bold">Imóveis Encontrados ({imoveisFiltrados.length})</h1>
+        </div>
+        <Link href="/" className="text-sm font-medium text-primary hover:underline whitespace-nowrap">
+          Carregar outra planilha
+        </Link>
       </div>
       
       <ImovelFilters 

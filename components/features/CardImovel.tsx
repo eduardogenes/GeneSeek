@@ -17,8 +17,8 @@ export default function CardImovel({ imovel }: CardImovelProps) {
 
   return (
     // Alterado: Adicionado `h-full` para que os cartões tenham a mesma altura na mesma linha e efeito de transição
-    <div className="border p-4 rounded-lg shadow-sm bg-card text-card-foreground flex flex-col justify-between h-full hover:shadow-md hover:-translate-y-1 transition-all duration-200">
-      <div>
+<div className="border p-4 rounded-lg shadow-sm bg-card text-card-foreground flex flex-col justify-between h-full hover:border-primary transition-colors duration-200">
+<div>
         {/* Bloco de Localização */}
         <div className="mb-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{imovel.cidade} - {imovel.uf}</p>
