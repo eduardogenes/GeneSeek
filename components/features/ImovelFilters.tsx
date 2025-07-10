@@ -4,7 +4,6 @@
 import { MultiSelectFilter } from "./filters/MultiSelectFilter";
 import { InputFilter } from "./filters/InputFilter";
 
-// A interface de props agora está mais simples.
 interface ImovelFiltersProps {
   opcoes: {
       cidades: string[];
@@ -27,16 +26,21 @@ interface ImovelFiltersProps {
   onClear: () => void;
 }
 
-/**
- * Componente principal que agrupa todos os filtros individuais.
- * Agora ele apenas orquestra os componentes de filtro reutilizáveis.
- */
 export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFiltersProps) {
   return (
-    <div className="p-4 border rounded-lg bg-card mb-6">
-      <h2 className="text-xl font-semibold mb-4">Filtros</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="p-4 border rounded-lg bg-card mb-6 shadow-sm">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Filtros</h2>
+        <button
+            onClick={onClear}
+            className="text-sm font-semibold text-primary hover:underline"
+          >
+            Limpar Filtros
+        </button>
+      </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
         <MultiSelectFilter
           label="Cidades"
           placeholder="Selecione as cidades"
@@ -77,12 +81,6 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
         />
 
       </div>
-      <button
-        onClick={onClear}
-        className="mt-4 text-sm font-semibold text-primary hover:underline"
-      >
-        Limpar Filtros
-      </button>
     </div>
   );
 }

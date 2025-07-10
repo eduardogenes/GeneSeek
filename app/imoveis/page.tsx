@@ -5,41 +5,59 @@ import { useImoveis } from "@/context/imoveis-context";
 import CardImovel from "@/components/features/CardImovel";
 import { ImovelFilters } from "@/components/features/ImovelFilters";
 import { useImovelFilters } from "@/lib/hooks/useImovelFilters";
+import Link from 'next/link';
 
 export default function ImoveisPage() {
   const { imoveis, isLoading } = useImoveis();
-
   const { imoveisFiltrados, opcoes, filtros, handlers, limparFiltros } = useImovelFilters(imoveis);
 
   if (isLoading) {
-    return <main className="p-8"><p>Processando planilha...</p></main>;
+    return (
+      <main className="flex h-screen items-center justify-center">
+        <p className="text-lg animate-pulse">Processando planilha...</p>
+      </main>
+    );
   }
 
   if (!imoveis || imoveis.length === 0) {
-    return <main className="p-8"><p>Nenhum imóvel para exibir. Volte e carregue uma planilha.</p></main>;
+    return (
+      <main className="flex flex-col h-screen items-center justify-center text-center">
+        <p className="text-xl font-semibold">Nenhum imóvel para exibir.</p>
+        <p className="text-muted-foreground mb-4">Volte e carregue uma planilha para começar.</p>
+        <Link href="/" className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-5 py-2">
+          Voltar para a Home
+        </Link>
+      </main>
+    );
   }
 
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Imóveis Encontrados ({imoveisFiltrados.length})</h1>
-
+    // Alterado: Adicionado um container para limitar a largura e centralizar
+    <main className="container mx-auto p-4 md:p-8">
+      <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl font-bold">Imóveis Encontrados ({imoveisFiltrados.length})</h1>
+          <Link href="/" className="text-sm font-medium text-primary hover:underline">
+            Carregar outra planilha
+          </Link>
+      </div>
+      
       <ImovelFilters 
         opcoes={opcoes}
         filtros={filtros}
         handlers={handlers}
         onClear={limparFiltros}
       />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {imoveisFiltrados.map((imovel) => (
-          <CardImovel key={imovel.id} imovel={imovel} />
-        ))}
-      </div>
-
-      {imoveisFiltrados.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-lg font-medium">Nenhum imóvel encontrado</p>
-          <p className="text-muted-foreground">Tente ajustar ou limpar os filtros.</p>
+      
+      {imoveisFiltrados.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {imoveisFiltrados.map((imovel) => (
+            <CardImovel key={imovel.id} imovel={imovel} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16">
+          <p className="text-xl font-semibold">Nenhum imóvel encontrado</p>
+          <p className="text-muted-foreground">Tente ajustar ou limpar os filtros para ver os resultados.</p>
         </div>
       )}
     </main>
