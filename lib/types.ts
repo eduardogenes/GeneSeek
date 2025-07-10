@@ -5,7 +5,7 @@
  * Garante a tipagem e a consistência dos objetos de imóveis em toda a aplicação.
  */
 export interface Imovel {
-  /** Identificador único do imóvel, essencial para chaves do React. */
+  /** Identificador único do imóvel */
   id: string;
 
   /** Número de identificação oficial da Caixa (opcional). */
@@ -20,6 +20,7 @@ export interface Imovel {
   desconto: string;
   descricao: string;
   modalidadeVenda: string;
+  tipoImovel: string; 
   link: string;
   
   /**

@@ -4,7 +4,7 @@
  * Define as chaves padronizadas para o objeto Imovel.
  * Garante consistência em toda a aplicação.
  */
-export type ImovelKey = 'numeroImovel' | 'uf' | 'cidade' | 'bairro' | 'endereco' | 'preco' | 'valorAvaliacao' | 'desconto' | 'descricao' | 'modalidadeVenda' | 'link' | 'id';
+export type ImovelKey = 'numeroImovel' | 'uf' | 'cidade' | 'bairro' | 'endereco' | 'preco' | 'valorAvaliacao' | 'desconto' | 'descricao' | 'modalidadeVenda' | 'link' | 'id' | 'tipoImovel'; // ADICIONADO 'tipoImovel'
 
 /**
  * Mapeamento de padrões de cabeçalho para as chaves padronizadas de Imovel.
@@ -22,5 +22,6 @@ export const HEADER_PATTERNS: { pattern: RegExp; name: ImovelKey }[] = [
   { pattern: /desconto|%\s*de\s*desconto/i, name: 'desconto' },
   { pattern: /descri[çc][aã]o|caracter[ií]sticas/i, name: 'descricao' },
   { pattern: /modalidade|tipo\s*de\s*venda/i, name: 'modalidadeVenda' },
+  { pattern: /tipo\s*de\s*im[oó]vel/i, name: 'tipoImovel' },
   { pattern: /link|acesso|url/i, name: 'link' }
 ];
