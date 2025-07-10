@@ -89,11 +89,7 @@
   /* ... (outras cores de gráfico) */
 }
 
-/* O seu tema escuro (.dark) permanece intacto e não precisa de alterações. */
-.dark {
-  /* ... */
-}
-
+/* O tema escuro (.dark) permanece intacto e não precisa de alterações. */
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
