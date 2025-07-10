@@ -7,6 +7,7 @@ import { Imovel } from '@/lib/types';
 export function useImovelFilters(imoveis: Imovel[]) {
   const [cidadesFiltro, setCidadesFiltro] = useState<string[]>([]);
   const [modalidadesFiltro, setModalidadesFiltro] = useState<string[]>([]);
+  const [tiposFiltro, setTiposFiltro] = useState<string[]>([]); 
   const [termoBairro, setTermoBairro] = useState('');
   const [bairroFiltro, setBairroFiltro] = useState('');
   const [precoMaxFiltro, setPrecoMaxFiltro] = useState('');
@@ -18,23 +19,25 @@ export function useImovelFilters(imoveis: Imovel[]) {
     return () => clearTimeout(timer);
   }, [termoBairro]);
 
-  const { cidadesUnicas, modalidadesUnicas } = useMemo(() => {
-    if (!imoveis) return { cidadesUnicas: [], modalidadesUnicas: [] };
+  const { cidadesUnicas, modalidadesUnicas, tiposUnicos } = useMemo(() => { 
+    if (!imoveis) return { cidadesUnicas: [], modalidadesUnicas: [], tiposUnicos: [] };
     const cidades = new Set(imoveis.map(imovel => imovel.cidade).filter(Boolean));
     const modalidades = new Set(imoveis.map(imovel => imovel.modalidadeVenda).filter(Boolean));
+    const tipos = new Set(imoveis.map(imovel => imovel.tipoImovel).filter(Boolean)); 
     return {
       cidadesUnicas: Array.from(cidades).sort(),
       modalidadesUnicas: Array.from(modalidades).sort(),
+      tiposUnicos: Array.from(tipos).sort(), 
     };
   }, [imoveis]);
 
-  // Renomeado para imoveisProcessados para clareza
   const imoveisProcessados = useMemo(() => {
     if (!imoveis) return [];
 
     const resultados = imoveis.filter(imovel => {
       if (cidadesFiltro.length > 0 && !cidadesFiltro.includes(imovel.cidade)) return false;
       if (modalidadesFiltro.length > 0 && !modalidadesFiltro.includes(imovel.modalidadeVenda)) return false;
+      if (tiposFiltro.length > 0 && !tiposFiltro.includes(imovel.tipoImovel)) return false; 
       if (bairroFiltro && !imovel.bairro.toLowerCase().includes(bairroFiltro.toLowerCase())) return false;
       if (precoMaxFiltro && parseFloat(imovel.preco) > parseFloat(precoMaxFiltro)) return false;
       if (descontoMinFiltro && parseFloat(imovel.desconto) < parseFloat(descontoMinFiltro)) return false;
@@ -51,7 +54,7 @@ export function useImovelFilters(imoveis: Imovel[]) {
     }
 
     return resultadosOrdenados;
-  }, [imoveis, cidadesFiltro, modalidadesFiltro, bairroFiltro, precoMaxFiltro, descontoMinFiltro, ordenacao]);
+  }, [imoveis, cidadesFiltro, modalidadesFiltro, tiposFiltro, bairroFiltro, precoMaxFiltro, descontoMinFiltro, ordenacao]); 
 
   const handleCidadeToggle = useCallback((cidade: string) => {
     setCidadesFiltro(prev => prev.includes(cidade) ? prev.filter(c => c !== cidade) : [...prev, cidade]);
@@ -61,9 +64,14 @@ export function useImovelFilters(imoveis: Imovel[]) {
     setModalidadesFiltro(prev => prev.includes(modalidade) ? prev.filter(m => m !== modalidade) : [...prev, modalidade]);
   }, []);
 
+  const handleTipoToggle = useCallback((tipo: string) => { 
+    setTiposFiltro(prev => prev.includes(tipo) ? prev.filter(t => t !== tipo) : [...prev, tipo]);
+  }, []);
+
   const limparFiltros = () => {
     setCidadesFiltro([]);
     setModalidadesFiltro([]);
+    setTiposFiltro([]); 
     setTermoBairro('');
     setPrecoMaxFiltro('');
     setDescontoMinFiltro('');
@@ -71,14 +79,16 @@ export function useImovelFilters(imoveis: Imovel[]) {
   };
 
   return {
-    imoveisProcessados, // CORREÇÃO: Devolvendo a variável com o nome correto.
+    imoveisProcessados,
     opcoes: {
       cidades: cidadesUnicas,
       modalidades: modalidadesUnicas,
+      tipos: tiposUnicos, 
     },
     filtros: {
       cidades: cidadesFiltro,
       modalidades: modalidadesFiltro,
+      tipos: tiposFiltro,
       bairro: termoBairro,
       precoMax: precoMaxFiltro,
       descontoMin: descontoMinFiltro,
@@ -87,6 +97,7 @@ export function useImovelFilters(imoveis: Imovel[]) {
     handlers: {
       handleCidadeToggle,
       handleModalidadeToggle,
+      handleTipoToggle, 
       setBairro: setTermoBairro,
       setPrecoMax: setPrecoMaxFiltro,
       setDescontoMin: setDescontoMinFiltro,

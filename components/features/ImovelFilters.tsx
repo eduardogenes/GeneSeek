@@ -8,10 +8,12 @@ interface ImovelFiltersProps {
   opcoes: {
     cidades: string[];
     modalidades: string[];
+    tipos: string[]; 
   };
   filtros: {
     cidades: string[];
     modalidades: string[];
+    tipos: string[]; 
     bairro: string;
     precoMax: string;
     descontoMin: string;
@@ -20,6 +22,7 @@ interface ImovelFiltersProps {
   handlers: {
     handleCidadeToggle: (cidade: string) => void;
     handleModalidadeToggle: (modalidade: string) => void;
+    handleTipoToggle: (tipo: string) => void; 
     setBairro: (value: string) => void;
     setPrecoMax: (value: string) => void;
     setDescontoMin: (value: string) => void;
@@ -38,7 +41,7 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4"> {/* AUMENTADO PARA 7 COLUNAS */}
         <div>
           <label htmlFor="ordenacao" className="block text-sm font-medium text-muted-foreground mb-1">Ordenar por</label>
           <select
@@ -66,6 +69,14 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
           options={opcoes.modalidades}
           selectedValues={filtros.modalidades}
           onToggle={handlers.handleModalidadeToggle}
+        />
+        {/* NOVO FILTRO DE TIPO DE IMÓVEL */}
+        <MultiSelectFilter
+          label="Tipo de Imóvel"
+          placeholder="Selecione os tipos"
+          options={opcoes.tipos}
+          selectedValues={filtros.tipos}
+          onToggle={handlers.handleTipoToggle}
         />
         <InputFilter
           label="Bairro"
