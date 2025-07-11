@@ -8,6 +8,7 @@ import { useImovelFilters } from "@/lib/hooks/useImovelFilters";
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/features/ThemeSwitcher'; // Adicionado
 
 export default function ImoveisPage() {
   // Pega os dados do contexto global
@@ -61,6 +62,7 @@ export default function ImoveisPage() {
           <Link href="/" className="text-sm font-medium text-primary hover:underline whitespace-nowrap">
             Carregar outra planilha
           </Link>
+          <ThemeSwitcher /> {/* Adicionado */}
         </div>
       </div>
       
