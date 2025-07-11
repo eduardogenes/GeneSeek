@@ -1,15 +1,23 @@
 /* app/globals.css */
 
+/* Importando bibliotecas de CSS */
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Definindo variante personalizada para tema escuro */
 @custom-variant dark (&:is(.dark *));
 
+/* Definindo tema personalizado */
 @theme inline {
+  /* Cores de fundo e texto */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  
+  /* Fontes */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Cores de sidebar */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -18,11 +26,15 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  
+  /* Cores de gráficos */
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  
+  /* Cores de elementos */
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,13 +51,17 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  
+  /* Tamanhos de bordas */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Definindo variáveis de tema */
 :root {
+  /* Tamanho de borda padrão */
   --radius: 0.625rem;
   
   /* FUNDO: Um tom de 'pedra' ou 'linho' quente. Aconchegante e fácil de olhar. */
@@ -53,44 +69,45 @@
   
   /* TEXTO: Um cinza-azulado escuro, que é mais suave que o preto puro. */
   --foreground: oklch(0.25 0.03 260);
-
+  
   /* CARTÕES: Um branco "sujo" (off-white) para criar um contraste subtil com o fundo. */
   --card: oklch(0.995 0.003 90);
   --card-foreground: oklch(0.25 0.03 260);
-
+  
+  /* POPUP: Mesma cor que o cartão */
   --popover: oklch(0.995 0.003 90);
   --popover-foreground: oklch(0.25 0.03 260);
-
+  
   /* COR PRIMÁRIA: Mantemos o seu azul escuro para ações principais. */
   --primary: oklch(0.208 0.042 265.755);
   --primary-foreground: oklch(0.98 0.003 247.858);
-
+  
   /* CORES SECUNDÁRIAS: Tons de cinza que complementam o fundo de 'pedra'. */
   --secondary: oklch(0.93 0.012 90);
   --secondary-foreground: oklch(0.25 0.03 260);
-
+  
+  /* CORES DE FUNDO E TEXTO DESATIVADOS */
   --muted: oklch(0.93 0.012 90);
   --muted-foreground: oklch(0.45 0.02 260);
-
+  
+  /* CORES DE DESTAQUE */
   --accent: oklch(0.93 0.012 90);
   --accent-foreground: oklch(0.25 0.03 260);
-
+  
   /* BORDA E INPUTS: Uma cor que define os limites sem ser demasiado forte. */
   --border: oklch(0.9 0.015 90);
   --input: oklch(0.9 0.015 90);
   
   /* Cor de 'foco' (anel) mantida */
   --ring: oklch(0.704 0.04 256.788);
-
+  
   /* Cores de destruição e gráficos mantidas */
   --destructive: oklch(0.577 0.245 27.325);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
-  
 }
 
 /* O tema escuro (.dark) permanece intacto e não precisa de alterações. */
-
 .dark {
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
@@ -125,11 +142,35 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/* Camada de estilos base */
 @layer base {
+  /* Estilo padrão para todos os elementos */
   * {
     @apply border-border outline-ring/50;
   }
+  
+  /* Estilo para o corpo da página */
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Animação de Brilho para o Título */
+@keyframes shine-effect {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Classe para texto com efeito de brilho */
+.text-shine {
+  background: linear-gradient(to right, #7C3AED 20%, #E9D5FF 40%, #E9D5FF 70%, #7C3AED 80%);
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shine-effect 5s linear infinite;
 }
