@@ -6,12 +6,23 @@ import { HEADER_PATTERNS, ImovelKey } from './parser-config';
 /**
  * Converte um número em formato string brasileiro (ex: "1.234,56") para um número.
  */
-function parseBrazilianNumber(value: string | undefined): number {
+function parseBrazilianCurrency(value: string | undefined): number {
   if (!value) return 0;
   // Remove pontos de milhar, troca a vírgula decimal por ponto e converte para float.
   const cleanedValue = value.replace(/\./g, '').replace(',', '.');
   return parseFloat(cleanedValue) || 0;
 }
+
+/**
+ * Converte um número de percentual, que pode usar vírgula ou ponto.
+ */
+function parsePercentage(value: string | undefined): number {
+  if (!value) return 0;
+  // Apenas troca a vírgula por ponto, mantendo os pontos existentes.
+  const cleanedValue = value.replace(',', '.');
+  return parseFloat(cleanedValue) || 0;
+}
+
 
 /**
  * Identifica a linha do cabeçalho no CSV e mapeia as colunas para as chaves padronizadas.
@@ -21,7 +32,6 @@ function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCo
   let maxMatches = 0;
   let bestMap: Record<number, ImovelKey> = {};
 
-  // Itera sobre as primeiras 5 linhas para encontrar a que mais se assemelha a um cabeçalho.
   for (let i = 0; i < Math.min(data.length, 5); i++) {
     const row = data[i];
     if (!row) continue;
@@ -49,7 +59,6 @@ function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCo
     }
   }
 
-  // Define um limiar mínimo de colunas para considerar o arquivo válido.
   const MINIMUM_MATCHES = 4;
   if (headerRowIndex === -1 || maxMatches < MINIMUM_MATCHES) {
     throw new Error(`Cabeçalho não identificado ou com poucas colunas conhecidas (encontradas: ${maxMatches}).`);
@@ -75,17 +84,16 @@ function processData(results: ParseResult<string[]>): Imovel[] {
         imovel[key] = value;
       }
       
-      // --- Limpeza e Extração de Dados ---
       if (imovel.descricao) {
         const tipoMatch = imovel.descricao.match(/^(\w+),/);
-        imovel.tipoImovel = tipoMatch ? tipoMatch[1] : 'Outros';
+        imovel.tipoImovel = tipoMatch ? tipoMatch[1] : 'Não informado';
       }
 
-      imovel.preco = parseBrazilianNumber(imovel.preco).toString();
-      imovel.valorAvaliacao = parseBrazilianNumber(imovel.valorAvaliacao).toString();
-      imovel.desconto = parseBrazilianNumber(imovel.desconto).toString();
+      // formatação de valores monetários e percentuais
+      imovel.preco = parseBrazilianCurrency(imovel.preco).toString();
+      imovel.valorAvaliacao = parseBrazilianCurrency(imovel.valorAvaliacao).toString();
+      imovel.desconto = parsePercentage(imovel.desconto).toString(); 
 
-      // --- Lógica de Geração de ID ---
       let finalId = imovel.numeroImovel || '';
       if (!finalId && imovel.link) {
         imovel.link = imovel.link.replace(/,+$/, '');
@@ -165,13 +173,10 @@ export function parseCsv(file: File, callback: (imoveis: Imovel[]) => void) {
             tryNextConfig();
           }
         } catch (error) {
-          // log para saber por que uma configuração específica falhou.
-          // console.warn(`Processamento falhou para a config: '${config.encoding}', '${config.delimiter}'`, error);
           tryNextConfig();
         }
       },
       error: (err) => {
-          // console.warn(`PapaParse falhou para a config: '${config.encoding}', '${config.delimiter}'`, err);
           tryNextConfig();
       },
     });
