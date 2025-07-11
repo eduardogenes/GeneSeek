@@ -2,9 +2,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, DownloadCloud } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useImoveis } from '@/context/imoveis-context';
+
+// --- CONTROLE DA FUNCIONALIDADE ---
+// Mudar para 'true' para reativar a busca automática pela API.
+// Mudar para 'false' para usar o link direto para o site da Caixa (solução provisória).
+const USE_API_FETCH = false;
+
+// URL da página de download de listas da Caixa
+const CAIXA_DOWNLOAD_URL = 'https://venda-imoveis.caixa.gov.br/sistema/download-lista.asp';
 
 // Lista de todos os estados disponíveis na Caixa
 const estados = [
@@ -17,16 +25,18 @@ const estados = [
 export default function DownloadCaixaButton() {
   // Estado selecionado (padrão Ceará)
   const [estado, setEstado] = useState('CE');
-  // Status da requisição
+  // Status da requisição (mantido para a lógica original)
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   
   const { setImoveis, setIsLoading } = useImoveis();
   const router = useRouter();
 
-  // Função que chama a API pra baixar e processar o CSV da Caixa
+  // Função que chama a API pra baixar e processar o CSV da Caixa (mantida em stand-by)
   const handleProcess = async () => {
+    if (!USE_API_FETCH) return; // Trava de segurança
     if (!estado) return alert('Selecione um estado.');
+    
     setStatus('loading');
     setIsLoading(true);
     setErrorMessage('');
@@ -67,29 +77,47 @@ export default function DownloadCaixaButton() {
         ))}
       </select>
 
-      {/* Botão de buscar */}
-      <button
-        onClick={handleProcess}
-        disabled={status === 'loading'}
-        className={`
-          inline-flex items-center justify-center rounded-md text-sm font-medium
-          bg-primary text-primary-foreground hover:bg-primary/90 
-          px-6 py-2 shadow-md transition-all h-10 w-full min-w-[200px]
-          ${status === 'loading' ? 'opacity-70 cursor-not-allowed' : ''}
-        `}
-      >
-        {status === 'loading' ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Buscando e Processando...
-          </>
-        ) : (
-          'Buscar e Analisar'
-        )}
-      </button>
+      {/* Renderização condicional baseada na flag USE_API_FETCH */}
+      {USE_API_FETCH ? (
+        // LÓGICA API: Botão que chama a API
+        <button
+          onClick={handleProcess}
+          disabled={status === 'loading'}
+          className={`
+            inline-flex items-center justify-center rounded-md text-sm font-medium
+            bg-primary text-primary-foreground hover:bg-primary/90 
+            px-6 py-2 shadow-md transition-all h-10 w-full min-w-[200px]
+            ${status === 'loading' ? 'opacity-70 cursor-not-allowed' : ''}
+          `}
+        >
+          {status === 'loading' ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Buscando e Processando...
+            </>
+          ) : (
+            'Buscar e Analisar'
+          )}
+        </button>
+      ) : (
+        // (FUNÇÃO PROVISÓRIA): direciona para o site da Caixa
+        <a
+          href={CAIXA_DOWNLOAD_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`
+            inline-flex items-center justify-center rounded-md text-sm font-medium
+            bg-primary text-primary-foreground hover:bg-primary/90 
+            px-6 py-2 shadow-md transition-all h-10 w-full min-w-[200px]
+          `}
+        >
+          <DownloadCloud className="mr-2 h-4 w-4" />
+          Acessar site da Caixa
+        </a>
+      )}
 
-      {/* Mensagem de erro */}
-      {status === 'error' && (
+      {/* Mensagem de erro (só aparece se a lógica da API estiver ativa) */}
+      {USE_API_FETCH && status === 'error' && (
         <p className="text-red-500 text-sm mt-2 w-full text-center sm:text-left">
           {errorMessage}
         </p>
