@@ -1,54 +1,34 @@
 // app/page.tsx
 'use client';
 
-// Importações essenciais do React e Next.js.
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-
-// Importações de lógica e estado específicos da aplicação.
 import { parseCsv } from '@/lib/parseCsv';
 import { useImoveis } from '@/context/imoveis-context';
-import { Loader2 } from 'lucide-react'; // Ícone para o feedback de carregamento.
+import { Loader2 } from 'lucide-react';
+import DownloadCaixaButton from '@/components/features/DownloadCaixaButton';
 
-// Novo botão de download da planilha Caixa.
-import DownloadCaixaButton from '@/components/features/DownloadCaixaButton'
-
-// A página inicial (Home) da aplicação.
 export default function Home() {
-  // Hook do Next.js para gerir a navegação entre páginas.
   const router = useRouter();
-  
-  // Hooks do contexto de imóveis para atualizar o estado global da aplicação.
   const { setImoveis, setIsLoading } = useImoveis();
-  
-  // Estado local para controlar o feedback visual do botão durante o processamento do ficheiro.
-  // Garante que o utilizador saiba que a aplicação está a trabalhar após o clique.
+  // Estado local só pra controlar o loading do upload de arquivo
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Handler para o evento de seleção de ficheiro.
-  // É acionado quando o utilizador seleciona um ficheiro no input.
+  // Função que roda quando o usuário seleciona um arquivo CSV
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    // Garante que um ficheiro foi de facto selecionado.
     if (!files || files.length === 0) return;
-
     const file = files[0];
-    
-    // Ativa os estados de carregamento para fornecer feedback visual imediato.
-    setIsLoading(true);   // Informa o contexto que uma operação de carregamento global começou.
-    setIsProcessing(true); // Ativa o estado local para alterar a UI do botão.
 
-    // Chama a função principal de parsing, passando o ficheiro e um callback.
-    // O callback será executado quando o parse terminar.
+    // Ativa os loadings (global e local)
+    setIsLoading(true);
+    setIsProcessing(true);
+
+    // Manda processar o CSV e quando terminar, salva no contexto e vai pra página de imóveis
     parseCsv(file, (imoveis) => {
-      // 1. Atualiza o estado global com a lista de imóveis processada.
       setImoveis(imoveis);
-      
-      // 2. Desativa o estado de carregamento global.
       setIsLoading(false);
-      
-      // 3. Navega para a página de imóveis.
       router.push('/imoveis');
     });
   };
@@ -68,49 +48,65 @@ export default function Home() {
               priority
             />
           </div>
+
           {/* Coluna do Conteúdo */}
           <div className="text-center md:text-left">
+            {/* Título com destaque tipográfico */}
             <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3">
-              Garimpeiro Genes
+              Garimpeiro
+              <span className="ml-2 font-medium text-primary/80">
+                Genes
+              </span>
             </h1>
-            <p className=" text-muted-foreground mb-8">
-              Encontre as melhores oportunidades em imóveis da Caixa. 
+
+            <p className="text-lg text-muted-foreground mb-8">
+              Sua plataforma de análise dos imóveis da Caixa.
             </p>
 
-            {/* Botão Upload CSV existente */}
-            <div className="mb-4">
-              <label
-                htmlFor="csv-upload"
-                className={`
-                  cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                  bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-6 py-2 shadow-md hover:shadow-lg 
-                  ${isProcessing ? 'opacity-75 cursor-not-allowed' : ''}
-                `}
-              >
-                {/* O conteúdo do botão é renderizado condicionalmente com base no estado `isProcessing`. */}
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    A processar...
-                  </>
-                ) : (
-                  'Carregar Planilha .CSV'
-                )}
-              </label>
-              {/* O input de ficheiro real fica escondido, mas é funcionalmente ligado ao label pelo `htmlFor`. */}
-              <input
-                id="csv-upload"
-                type="file"
-                accept=".csv"
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={isProcessing} // Desativa o input para prevenir múltiplos uploads.
-              />
-            </div>
+            <div className="space-y-6">
+              {/* Opção 1: Busca Automática - usa o componente que baixa direto da Caixa */}
+              <div>
+                <h2 className="text-lg font-semibold mb-2">Busca Automática</h2>
+                <p className="text-sm text-muted-foreground mb-3">Analise a lista oficial da Caixa selecionando um estado.</p>
+                <DownloadCaixaButton />
+              </div>
 
-            {/* NOVO Botão Download Planilha Caixa */}
-            <DownloadCaixaButton />
+              {/* Separador visual */}
+              <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-border"></div>
+                  <span className="flex-shrink mx-4 text-muted-foreground font-semibold">OU</span>
+                  <div className="flex-grow border-t border-border"></div>
+              </div>
+
+              {/* Opção 2: Upload de arquivo local */}
+              <div>
+                <h2 className="text-lg font-semibold mb-2">Arquivo Local</h2>
+                <p className="text-sm text-muted-foreground mb-3">Envie um arquivo `.csv` que você já tenha para uma análise interativa.</p>
+                <label
+                  htmlFor="csv-upload"
+                  className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 h-11 px-6 py-2 shadow-md transition-colors"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    'Carregar do seu computador'
+                  )}
+                </label>
+                {/* Input hidden que é ativado quando clica no label */}
+                <input
+                  id="csv-upload"
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={isProcessing}
+                />
+              </div>
             </div>
+          </div>
         </div>
       </div>
     </main>
