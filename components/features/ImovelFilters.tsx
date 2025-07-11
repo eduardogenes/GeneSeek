@@ -4,16 +4,28 @@
 import { MultiSelectFilter } from "./filters/MultiSelectFilter";
 import { InputFilter } from "./filters/InputFilter";
 
+// Componentes do Shadcn pra fazer o dropdown de ordenação
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+
+// Interface pra definir os props do componente
 interface ImovelFiltersProps {
   opcoes: {
     cidades: string[];
     modalidades: string[];
-    tipos: string[]; 
+    tipos: string[];
   };
   filtros: {
     cidades: string[];
     modalidades: string[];
-    tipos: string[]; 
+    tipos: string[];
     bairro: string;
     precoMax: string;
     descontoMin: string;
@@ -22,7 +34,7 @@ interface ImovelFiltersProps {
   handlers: {
     handleCidadeToggle: (cidade: string) => void;
     handleModalidadeToggle: (modalidade: string) => void;
-    handleTipoToggle: (tipo: string) => void; 
+    handleTipoToggle: (tipo: string) => void;
     setBairro: (value: string) => void;
     setPrecoMax: (value: string) => void;
     setDescontoMin: (value: string) => void;
@@ -31,6 +43,14 @@ interface ImovelFiltersProps {
   onClear: () => void;
 }
 
+// Mapeamento dos valores internos pra textos bonitos no botão
+const ordenacaoLabels: { [key: string]: string } = {
+  'maior-desconto': 'Maior Desconto',
+  'menor-preco': 'Menor Preço',
+  'maior-preco': 'Maior Preço',
+};
+
+// Componente principal de filtros
 export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFiltersProps) {
   return (
     <div className="p-4 border rounded-lg bg-card mb-6 shadow-sm">
@@ -41,63 +61,93 @@ export function ImovelFilters({ opcoes, filtros, handlers, onClear }: ImovelFilt
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4"> {/* AUMENTADO PARA 7 COLUNAS */}
-        <div>
-          <label htmlFor="ordenacao" className="block text-sm font-medium text-muted-foreground mb-1">Ordenar por</label>
-          <select
-            id="ordenacao"
-            value={filtros.ordenacao}
-            onChange={(e) => handlers.setOrdenacao(e.target.value)}
-            className="w-full h-10 px-3 bg-background border rounded-md text-sm"
-          >
-            <option value="maior-desconto">Maior Desconto</option>
-            <option value="menor-preco">Menor Preço</option>
-            <option value="maior-preco">Maior Preço</option>
-          </select>
+      <div className="flex flex-wrap gap-4 items-end">
+        {/* Dropdown de ordenação usando Shadcn */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <label className="block text-sm font-medium text-muted-foreground mb-1">Ordenar por</label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full justify-start font-normal">
+                {ordenacaoLabels[filtros.ordenacao] || 'Selecione a ordenação'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="start">
+              <DropdownMenuRadioGroup 
+                value={filtros.ordenacao} 
+                onValueChange={handlers.setOrdenacao}
+              >
+                <DropdownMenuRadioItem value="maior-desconto">Maior Desconto</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="menor-preco">Menor Preço</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="maior-preco">Maior Preço</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
-        <MultiSelectFilter
-          label="Cidades"
-          placeholder="Selecione as cidades"
-          options={opcoes.cidades}
-          selectedValues={filtros.cidades}
-          onToggle={handlers.handleCidadeToggle}
-        />
-        <MultiSelectFilter
-          label="Modalidades"
-          placeholder="Selecione as modalidades"
-          options={opcoes.modalidades}
-          selectedValues={filtros.modalidades}
-          onToggle={handlers.handleModalidadeToggle}
-        />
-        {/* NOVO FILTRO DE TIPO DE IMÓVEL */}
-        <MultiSelectFilter
-          label="Tipo de Imóvel"
-          placeholder="Selecione os tipos"
-          options={opcoes.tipos}
-          selectedValues={filtros.tipos}
-          onToggle={handlers.handleTipoToggle}
-        />
-        <InputFilter
-          label="Bairro"
-          placeholder="Nome do bairro"
-          value={filtros.bairro}
-          onChange={handlers.setBairro}
-        />
-        <InputFilter
-          label="Preço Máximo"
-          placeholder="Ex: 300000"
-          type="number"
-          value={filtros.precoMax}
-          onChange={handlers.setPrecoMax}
-        />
-        <InputFilter
-          label="Desconto Mínimo (%)"
-          placeholder="Ex: 40"
-          type="number"
-          value={filtros.descontoMin}
-          onChange={handlers.setDescontoMin}
-        />
+        {/* Filtro de cidades - usa componente reutilizável */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <MultiSelectFilter
+            label="Cidades"
+            placeholder="Selecione as cidades"
+            options={opcoes.cidades}
+            selectedValues={filtros.cidades}
+            onToggle={handlers.handleCidadeToggle}
+          />
+        </div>
+        
+        {/* Filtro de modalidades */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <MultiSelectFilter
+            label="Modalidades"
+            placeholder="Selecione as modalidades"
+            options={opcoes.modalidades}
+            selectedValues={filtros.modalidades}
+            onToggle={handlers.handleModalidadeToggle}
+          />
+        </div>
+
+        {/* Filtro de tipos de imóvel */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <MultiSelectFilter
+            label="Tipo de Imóvel"
+            placeholder="Selecione os tipos"
+            options={opcoes.tipos}
+            selectedValues={filtros.tipos}
+            onToggle={handlers.handleTipoToggle}
+          />
+        </div>
+
+        {/* Input de busca por bairro */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <InputFilter
+            label="Bairro"
+            placeholder="Nome do bairro"
+            value={filtros.bairro}
+            onChange={handlers.setBairro}
+          />
+        </div>
+
+        {/* Input de preço máximo */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <InputFilter
+            label="Preço Máximo"
+            placeholder="Ex: 300000"
+            type="number"
+            value={filtros.precoMax}
+            onChange={handlers.setPrecoMax}
+          />
+        </div>
+
+        {/* Input de desconto mínimo */}
+        <div className="w-full sm:w-auto lg:min-w-[180px] flex-grow">
+          <InputFilter
+            label="Desconto Mínimo (%)"
+            placeholder="Ex: 40"
+            type="number"
+            value={filtros.descontoMin}
+            onChange={handlers.setDescontoMin}
+          />
+        </div>
       </div>
     </div>
   );
