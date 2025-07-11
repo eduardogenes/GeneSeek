@@ -11,6 +11,9 @@ import { parseCsv } from '@/lib/parseCsv';
 import { useImoveis } from '@/context/imoveis-context';
 import { Loader2 } from 'lucide-react'; // Ícone para o feedback de carregamento.
 
+// Novo botão de download da planilha Caixa.
+import DownloadCaixaButton from '@/components/features/DownloadCaixaButton'
+
 // A página inicial (Home) da aplicação.
 export default function Home() {
   // Hook do Next.js para gerir a navegação entre páginas.
@@ -45,8 +48,7 @@ export default function Home() {
       // 2. Desativa o estado de carregamento global.
       setIsLoading(false);
       
-      // 3. Redireciona o utilizador para a página de resultados.
-      // A navegação ocorre após o processamento, não sendo necessário desativar `isProcessing` aqui.
+      // 3. Navega para a página de imóveis.
       router.push('/imoveis');
     });
   };
@@ -63,17 +65,20 @@ export default function Home() {
               width={500}
               height={400}
               className="w-full max-w-md mx-auto"
-              priority // Prioriza o carregamento desta imagem, pois é crítica para a primeira visualização.
+              priority
             />
           </div>
           {/* Coluna do Conteúdo */}
           <div className="text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3">Garimpeiro Genes</h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Encontre as melhores oportunidades em imóveis da Caixa. Transforme planilhas em análises visuais, de forma rápida e simples.
+            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3">
+              Garimpeiro Genes
+            </h1>
+            <p className=" text-muted-foreground mb-8">
+              Encontre as melhores oportunidades em imóveis da Caixa. 
             </p>
-            <div>
-              {/* O `label` funciona como um botão de upload personalizado. */}
+
+            {/* Botão Upload CSV existente */}
+            <div className="mb-4">
               <label
                 htmlFor="csv-upload"
                 className={`
@@ -102,7 +107,10 @@ export default function Home() {
                 disabled={isProcessing} // Desativa o input para prevenir múltiplos uploads.
               />
             </div>
-          </div>
+
+            {/* NOVO Botão Download Planilha Caixa */}
+            <DownloadCaixaButton />
+            </div>
         </div>
       </div>
     </main>
