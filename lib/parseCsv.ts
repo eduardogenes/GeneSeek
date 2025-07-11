@@ -3,35 +3,30 @@ import Papa, { ParseResult } from 'papaparse';
 import { Imovel } from '@/lib/types';
 import { HEADER_PATTERNS, ImovelKey } from './parser-config';
 
-/**
- * Converte um número em formato string brasileiro (ex: "1.234,56") para um número.
- */
+// Converte valores monetários brasileiros pra number
 function parseBrazilianCurrency(value: string | undefined): number {
   if (!value) return 0;
-  // Remove pontos de milhar, troca a vírgula decimal por ponto e converte para float.
+  // Remove pontos de milhar, troca vírgula por ponto e converte
   const cleanedValue = value.replace(/\./g, '').replace(',', '.');
   return parseFloat(cleanedValue) || 0;
 }
 
-/**
- * Converte um número de percentual, que pode usar vírgula ou ponto.
- */
+// Converte percentual que pode ter vírgula ou ponto
 function parsePercentage(value: string | undefined): number {
   if (!value) return 0;
-  // Apenas troca a vírgula por ponto, mantendo os pontos existentes.
+  // Só troca vírgula por ponto
   const cleanedValue = value.replace(',', '.');
   return parseFloat(cleanedValue) || 0;
 }
 
 
-/**
- * Identifica a linha do cabeçalho no CSV e mapeia as colunas para as chaves padronizadas.
- */
+// Função que acha o cabeçalho no CSV e mapeia as colunas pros nossos campos
 function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCols: Record<number, ImovelKey> } {
   let headerRowIndex = -1;
   let maxMatches = 0;
   let bestMap: Record<number, ImovelKey> = {};
 
+  // Procura nas primeiras 5 linhas
   for (let i = 0; i < Math.min(data.length, 5); i++) {
     const row = data[i];
     if (!row) continue;
@@ -39,6 +34,7 @@ function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCo
     const currentMap: Record<number, ImovelKey> = {};
     let matchesCount = 0;
 
+    // Pra cada célula da linha, tenta fazer match com os padrões
     row.forEach((cell, cellIndex) => {
       if (typeof cell !== 'string') return;
       
@@ -52,6 +48,7 @@ function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCo
       }
     });
 
+    // Se essa linha teve mais matches, ela é a melhor candidata
     if (matchesCount > maxMatches) {
       maxMatches = matchesCount;
       headerRowIndex = i;
@@ -59,6 +56,7 @@ function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCo
     }
   }
 
+  // Precisa ter pelo menos 4 colunas conhecidas
   const MINIMUM_MATCHES = 4;
   if (headerRowIndex === -1 || maxMatches < MINIMUM_MATCHES) {
     throw new Error(`Cabeçalho não identificado ou com poucas colunas conhecidas (encontradas: ${maxMatches}).`);
@@ -67,35 +65,39 @@ function findAndMapHeaders(data: string[][]): { headerRowIndex: number; mappedCo
   return { headerRowIndex, mappedCols: bestMap };
 }
 
-/**
- * Transforma os dados brutos do CSV em um array de objetos `Imovel`.
- */
+// Pega os dados brutos do CSV e transforma em array de objetos Imovel
 function processData(results: ParseResult<string[]>): Imovel[] {
+    // Primeiro acha onde tá o cabeçalho
     const { headerRowIndex, mappedCols } = findAndMapHeaders(results.data);
     const dataRows = results.data.slice(headerRowIndex + 1);
 
     return dataRows.map((row, rowIndex) => {
+      // Se a linha tá muito vazia, ignora
       if (!row || row.length < Object.keys(mappedCols).length * 0.5) return null;
       
       const imovel: Partial<Imovel> = {};
+      // Mapeia cada coluna pro campo correto
       for (const colIndex in mappedCols) {
         const key = mappedCols[colIndex];
         const value = row[colIndex] ? row[colIndex].trim() : '';
         imovel[key] = value;
       }
       
+      // Tenta extrair o tipo do imóvel da descrição
       if (imovel.descricao) {
         const tipoMatch = imovel.descricao.match(/^(\w+),/);
-        imovel.tipoImovel = tipoMatch ? tipoMatch[1] : 'Não informado';
+        imovel.tipoImovel = tipoMatch ? tipoMatch[1] : 'Outros';
       }
 
-      // formatação de valores monetários e percentuais
+      // Formata os valores monetários e percentuais
       imovel.preco = parseBrazilianCurrency(imovel.preco).toString();
       imovel.valorAvaliacao = parseBrazilianCurrency(imovel.valorAvaliacao).toString();
-      imovel.desconto = parsePercentage(imovel.desconto).toString(); 
+      imovel.desconto = parsePercentage(imovel.desconto).toString();
 
+      // Gera um ID único pro imóvel
       let finalId = imovel.numeroImovel || '';
       if (!finalId && imovel.link) {
+        // Remove vírgulas no final e tenta extrair ID do link
         imovel.link = imovel.link.replace(/,+$/, '');
         const match = imovel.link.match(/hdnimovel=(\d+)/);
         if (match && match[1]) {
@@ -103,6 +105,7 @@ function processData(results: ParseResult<string[]>): Imovel[] {
         }
       }
       if (!finalId) {
+        // Fallback: cria ID com base nos dados
         const fallbackId = `${imovel.endereco}-${imovel.cidade}-${imovel.preco}-${rowIndex}`;
         finalId = fallbackId;
       }
@@ -113,15 +116,15 @@ function processData(results: ParseResult<string[]>): Imovel[] {
     }).filter(imovel => imovel !== null && imovel.id) as Imovel[];
 }
 
-/**
- * Verifica se os dados processados são válidos.
- */
+// Verifica se os dados processados fazem sentido
 function isDataSane(imoveis: Imovel[]): boolean {
     if (imoveis.length === 0) return false;
 
+    // Conta quantos imóveis não têm preço
     const invalidPriceCount = imoveis.filter(imovel => !imovel.preco || parseFloat(imovel.preco) === 0).length;
     const invalidRatio = invalidPriceCount / imoveis.length;
 
+    // Se mais de 70% não tem preço, algo tá errado
     if (invalidRatio > 0.7) {
         console.warn(`Verificação de sanidade falhou: ${Math.round(invalidRatio * 100)}% dos imóveis estão sem preço.`);
         return false;
@@ -130,10 +133,9 @@ function isDataSane(imoveis: Imovel[]): boolean {
     return true;
 }
 
-/**
- * Orquestra a análise do arquivo CSV, testando diferentes configurações.
- */
+// Função principal que tenta processar o CSV com diferentes configurações
 export function parseCsv(file: File, callback: (imoveis: Imovel[]) => void) {
+  // Diferentes combinações de encoding e delimitador pra tentar
   const configsToTry = [
     { encoding: 'ISO-8859-1', delimiter: ';' },
     { encoding: 'utf-8', delimiter: ';' },
@@ -142,12 +144,16 @@ export function parseCsv(file: File, callback: (imoveis: Imovel[]) => void) {
   ];
 
   let configIndex = 0;
+  let success = false;
 
+  // Função recursiva que tenta cada configuração
   const tryNextConfig = () => {
-    if (configIndex >= configsToTry.length) {
-      console.error("FALHA FINAL: Nenhuma configuração de parse funcionou.");
-      alert("Não foi possível ler o arquivo. O formato é desconhecido ou o arquivo está corrompido.");
-      callback([]);
+    if (configIndex >= configsToTry.length || success) {
+      if (!success) {
+        console.error("FALHA FINAL: Nenhuma configuração de parse funcionou para o arquivo enviado.");
+        alert("Não foi possível ler o arquivo. O formato é desconhecido ou o arquivo está corrompido.");
+        callback([]);
+      }
       return;
     }
     
@@ -159,6 +165,8 @@ export function parseCsv(file: File, callback: (imoveis: Imovel[]) => void) {
       skipEmptyLines: true,
       header: false,
       complete: (results) => {
+        if (success) return;
+
         if (!results.data || results.data.length < 2) {
             tryNextConfig();
             return;
@@ -167,20 +175,20 @@ export function parseCsv(file: File, callback: (imoveis: Imovel[]) => void) {
         try {
           const imoveis = processData(results);
           if (isDataSane(imoveis)) {
-            console.log(`Sucesso com: codificação '${config.encoding}', delimitador '${config.delimiter}'`);
+            success = true;
+            console.log(`Sucesso no upload com: codificação '${config.encoding}', delimitador '${config.delimiter}'`);
             callback(imoveis);
           } else {
             tryNextConfig();
           }
-        } catch (error) {
+        } catch {
           tryNextConfig();
         }
       },
-      error: (err) => {
+      error: () => {
           tryNextConfig();
       },
     });
   };
-
   tryNextConfig();
 }
