@@ -6,12 +6,15 @@ import CardImovel from "@/components/features/CardImovel";
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Página que mostra todos os imóveis favoritados
+// Pega a lista direto do contexto global
 export default function FavoritosPage() {
-  // Pegamos a lista de favoritos diretamente do nosso contexto global.
+  // Acessa a lista de favoritos do contexto
   const { favorites } = useImoveis();
 
   return (
     <main className="container mx-auto p-4 md:p-8">
+      {/* Cabeçalho com contador de favoritos */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <Image
@@ -28,15 +31,16 @@ export default function FavoritosPage() {
         </Link>
       </div>
       
+      {/* Grid de favoritos ou mensagem vazia */}
       {favorites.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {/* Mapeamos a lista de favoritos e renderizamos um card para cada um */}
+          {/* Reutiliza o mesmo componente de card da listagem */}
           {favorites.map((imovel) => (
             <CardImovel key={imovel.id} imovel={imovel} />
           ))}
         </div>
       ) : (
-        // Mensagem exibida se não houver nenhum imóvel favoritado
+        // Mensagem quando não tem nenhum favorito
         <div className="text-center py-16">
           <p className="text-xl font-semibold">Nenhum imóvel favoritado ainda</p>
           <p className="text-muted-foreground">Volte para a lista de imóveis e clique na estrela para salvar os que você mais gostar.</p>

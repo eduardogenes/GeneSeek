@@ -20,10 +20,8 @@ interface MultiSelectFilterProps {
   onToggle: (value: string) => void;
 }
 
-/**
- * Um componente de filtro genérico que renderiza um botão para abrir um
- * menu dropdown com opções de seleção múltipla, incluindo uma barra de pesquisa interna.
- */
+// Componente de filtro que permite selecionar múltiplas opções
+// Tem busca interna pra quando a lista fica muito grande
 export function MultiSelectFilter({
   label,
   placeholder,
@@ -31,9 +29,10 @@ export function MultiSelectFilter({
   selectedValues = [],
   onToggle,
 }: MultiSelectFilterProps) {
-  // Estado local para controlar o termo de pesquisa dentro do dropdown.
+  // Estado local pra controlar a busca dentro do dropdown
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Texto do botão baseado na quantidade selecionada
   const buttonText =
     selectedValues.length === 0
       ? placeholder
@@ -41,7 +40,7 @@ export function MultiSelectFilter({
       ? selectedValues[0]
       : `${selectedValues.length} selecionados`;
 
-  // Filtra as opções com base no termo de pesquisa antes de as renderizar.
+  // Filtra as opções com base no que o usuário digitou
   const filteredOptions = options.filter(option =>
     option.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -58,7 +57,7 @@ export function MultiSelectFilter({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-60 p-2" align="start">
-          {/* Campo de input para a pesquisa */}
+          {/* Campo de busca dentro do dropdown */}
           <Input
             placeholder={`Pesquisar ${label.toLowerCase()}...`}
             value={searchTerm}
@@ -67,20 +66,20 @@ export function MultiSelectFilter({
           />
           <DropdownMenuSeparator />
 
-          {/* O `map` agora itera sobre as opções JÁ FILTRADAS */}
+          {/* Lista as opções já filtradas pela busca */}
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => (
               <DropdownMenuCheckboxItem
                 key={option}
                 checked={selectedValues.includes(option)}
                 onCheckedChange={() => onToggle(option)}
-                onSelect={(e) => e.preventDefault()}
+                onSelect={(e) => e.preventDefault()} // Impede que feche o dropdown ao selecionar
               >
                 {option}
               </DropdownMenuCheckboxItem>
             ))
           ) : (
-            // Feedback caso a pesquisa não encontre resultados.
+            // Feedback quando a busca não encontra nada
             <p className="p-2 text-sm text-muted-foreground text-center">Nenhum resultado.</p>
           )}
         </DropdownMenuContent>

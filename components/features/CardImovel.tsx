@@ -10,27 +10,29 @@ interface CardImovelProps {
   imovel: Imovel;
 }
 
+// Componente do card que mostra cada imóvel na lista
+// Tem lógica de navegação, favoritos e formatação de valores
 export default function CardImovel({ imovel }: CardImovelProps) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useImoveis();
 
   const ehFavorito = isFavorite(imovel.id);
 
-  // Formata valores monetários para o padrão brasileiro
+  // Formata valores monetários pro padrão brasileiro
   const formatCurrency = (value: string) => {
     const number = parseFloat(value);
     if (isNaN(number)) return 'N/A';
     return number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  // Navega para a página de detalhes do imóvel
+  // Quando clica no card, vai pra página de detalhes
   const handleCardClick = () => {
     router.push(`/imoveis/${imovel.id}`);
   };
 
-  // Adiciona ou remove o imóvel dos favoritos
+  // Adiciona/remove dos favoritos sem acionar a navegação
   const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Impede que o clique no botão de favoritar navegue para a página de detalhes
+    e.stopPropagation(); // Impede que o clique navegue pro detalhe
     toggleFavorite(imovel);
   };
 
@@ -40,15 +42,15 @@ export default function CardImovel({ imovel }: CardImovelProps) {
   };
 
   return (
-    // O card agora é uma div com um evento de clique para navegação
+    // Card clicável que navega pro detalhe do imóvel
     <div 
       onClick={handleCardClick}
       className="h-full border p-4 rounded-lg shadow-sm bg-card text-card-foreground flex flex-col hover:border-primary transition-all duration-300 ease-in-out cursor-pointer relative"
-      role="link" // Adiciona semântica para acessibilidade
-      tabIndex={0} // Permite que a div seja focável com o teclado
+      role="link" // Pra acessibilidade
+      tabIndex={0} // Permite navegação por teclado
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleCardClick()}
     >
-      {/* Botão para favoritar */}
+      {/* Botão de favorito no canto superior direito */}
       <button
         onClick={handleFavoriteClick}
         className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-muted z-10"
@@ -57,19 +59,21 @@ export default function CardImovel({ imovel }: CardImovelProps) {
         <Star className={`h-5 w-5 transition-colors ${ehFavorito ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`} />
       </button>
 
-      {/* Cabeçalho */}
-      <div className="flex-shrink-0 pr-8"> {/* Padding para o texto não ficar embaixo do botão */}
+      {/* Cabeçalho com localização e tipo */}
+      <div className="flex-shrink-0 pr-8"> {/* Padding pra não ficar embaixo do botão */}
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">{imovel.tipoImovel} • {imovel.cidade} - {imovel.uf}</p>
         <h3 className="font-bold text-lg text-primary truncate">{imovel.bairro}</h3>
         <p className="text-sm text-muted-foreground truncate mb-3" title={imovel.endereco}>{imovel.endereco}</p>
       </div>
 
-      {/* Corpo do Card */}
+      {/* Corpo do card com descrição */}
       <div className="flex flex-col flex-1 min-h-0">
+        {/* Caixa da descrição com altura limitada */}
         <div className="bg-muted/50 rounded-md border p-3 mb-3 flex-1 min-h-[70px] max-h-[100px] overflow-y-hidden">
           <p className="text-sm text-foreground/80">{imovel.descricao}</p>
         </div>
 
+        {/* Informações financeiras */}
         <div className="mt-auto space-y-1.5 text-sm">
           <div className="flex justify-between items-center">
             <span className="font-semibold text-muted-foreground">Preço:</span>
@@ -92,7 +96,7 @@ export default function CardImovel({ imovel }: CardImovelProps) {
         </div>
       </div>
 
-      {/* Botão de link externo */}
+      {/* Botão pra ver anúncio original na Caixa */}
       {imovel.link && (
         <div className="mt-4 pt-2 border-t">
           <a 

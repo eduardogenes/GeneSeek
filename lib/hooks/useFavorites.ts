@@ -4,14 +4,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Imovel } from '@/lib/types';
 
-// O nome que usaremos para salvar a lista no localStorage.
+// Chave que usa no localStorage pra salvar os favoritos
 const FAVORITES_KEY = 'geneseek-favorites';
 
+// Hook que gerencia a lista de favoritos usando localStorage
 export function useFavorites() {
   const [favorites, setFavorites] = useState<Imovel[]>([]);
 
-  // Este useEffect roda apenas uma vez, quando o componente é montado.
-  // Ele carrega os favoritos que já estavam salvos no navegador.
+  // Quando o componente monta, carrega os favoritos salvos
   useEffect(() => {
     try {
       const items = window.localStorage.getItem(FAVORITES_KEY);
@@ -23,7 +23,7 @@ export function useFavorites() {
     }
   }, []);
 
-  // Função para salvar os favoritos no localStorage sempre que a lista mudar.
+  // Função pra salvar a lista no localStorage sempre que mudar
   const saveFavorites = (items: Imovel[]) => {
     try {
       setFavorites(items);
@@ -33,23 +33,23 @@ export function useFavorites() {
     }
   };
 
-  // Adiciona ou remove um imóvel da lista de favoritos.
+  // Adiciona ou remove um imóvel dos favoritos
   const toggleFavorite = useCallback((imovel: Imovel) => {
     const isFavorited = favorites.some(fav => fav.id === imovel.id);
     let newFavorites;
 
     if (isFavorited) {
-      // Remove o imóvel se ele já for um favorito
+      // Remove se já tá favoritado
       newFavorites = favorites.filter(fav => fav.id !== imovel.id);
     } else {
-      // Adiciona o imóvel se ele não for um favorito
+      // Adiciona se não tá favoritado
       newFavorites = [...favorites, imovel];
     }
     
     saveFavorites(newFavorites);
   }, [favorites]);
 
-  // Verifica se um imóvel específico já está na lista de favoritos.
+  // Função pra checar se um imóvel específico tá favoritado
   const isFavorite = useCallback((imovelId: string) => {
     return favorites.some(fav => fav.id === imovelId);
   }, [favorites]);

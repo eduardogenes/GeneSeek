@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "Encontre as melhores oportunidades em imóveis da Caixa",
 };
 
+// Layout principal que envolve toda a aplicação
+// Configura o contexto global e fontes
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,10 +24,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
-        <ImoveisProvider>{children}</ImoveisProvider> { /* Envolva o children */ }
+        {/* Envolve toda a aplicação com o Provider do contexto */}
+        <ImoveisProvider>{children}</ImoveisProvider> 
       </body>
     </html>
   );
 }
-
-// Motivo: Ao colocar o provider no layout raiz, garantimos que o estado dos imóveis estará disponível em todas as páginas da aplicação.

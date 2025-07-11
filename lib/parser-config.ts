@@ -1,16 +1,12 @@
 // lib/parser-config.ts
 
-/**
- * Define as chaves padronizadas para o objeto Imovel.
- * Garante consistência em toda a aplicação.
- */
-export type ImovelKey = 'numeroImovel' | 'uf' | 'cidade' | 'bairro' | 'endereco' | 'preco' | 'valorAvaliacao' | 'desconto' | 'descricao' | 'modalidadeVenda' | 'link' | 'id' | 'tipoImovel'; // ADICIONADO 'tipoImovel'
+// Define as chaves padronizadas para o objeto Imovel
+// Garante consistência em toda a aplicação
+export type ImovelKey = 'numeroImovel' | 'uf' | 'cidade' | 'bairro' | 'endereco' | 'preco' | 'valorAvaliacao' | 'desconto' | 'descricao' | 'modalidadeVenda' | 'link' | 'id' | 'tipoImovel';
 
-/**
- * Mapeamento de padrões de cabeçalho para as chaves padronizadas de Imovel.
- * Usa RegExp para lidar com variações comuns nos nomes das colunas dos arquivos CSV da Caixa,
- * como acentuação, maiúsculas/minúsculas e palavras alternativas.
- */
+// Mapeamento de padrões de cabeçalho para as chaves padronizadas de Imovel
+// Usa RegExp pra lidar com variações comuns nos nomes das colunas dos CSVs da Caixa
+// Como acentuação, maiúsculas/minúsculas e palavras alternativas
 export const HEADER_PATTERNS: { pattern: RegExp; name: ImovelKey }[] = [
   { pattern: /n[º°]\s*do\s*im[oó]vel/i, name: 'numeroImovel' },
   { pattern: /uf|estado/i, name: 'uf' },

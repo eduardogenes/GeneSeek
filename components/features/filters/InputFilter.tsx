@@ -9,9 +9,8 @@ interface InputFilterProps {
   type?: 'text' | 'number';
 }
 
-/**
- * Um componente de filtro genérico que renderiza um label e um input.
- */
+// Componente de filtro genérico que renderiza um label e um input
+// Usado pra bairro, preço máximo, etc.
 export function InputFilter({
   label,
   placeholder,
